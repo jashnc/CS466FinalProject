@@ -36,16 +36,18 @@ def generate_motif(SC, SL, ML, ICPC):
     sample_sequence = generate_sequence(SC, ML)
     nucleotides = ['A','C','G','T']
     profile_matrix = []
+    pwm_before = []
     for h in range(ML):
         col = [row[h] for row in sample_sequence]
-        row_count = count(col, SC, ICPC, ML)
+        row_count, pwm_before_count = count(col, SC, ICPC, ML)
         profile_matrix.append(row_count)
+        pwm_before.append(pwm_before_count)
     pwm = list(zip(*profile_matrix[::-1]))
-    return pwm
+    return pwm, pwm_before
 
 
 def count(sequence, SC, ICPC, ML):
-    counter = [0,0,0,0]
+    counter = [0, 0, 0, 0]
     for i in range(len(sequence)):
         if sequence[i] == 'A':
             counter[0]+=1
@@ -56,6 +58,7 @@ def count(sequence, SC, ICPC, ML):
         elif sequence[i] == 'T':
             counter[3]+=1
 
+    pwm_counter = counter
     counter = [(x / SC) for x in counter]
     if counter[0] != 0.0:
         counter[0] = -math.log2(counter[0])
@@ -75,7 +78,7 @@ def count(sequence, SC, ICPC, ML):
         total = ICPC/sum_counter
         counter = [x * total for x in counter]
 
-    return counter
+    return counter, pwm_counter
 
 
 def generate_binding_sites(pwm, SC, SL, ML):
@@ -128,7 +131,7 @@ def plant(sequences, binding_sites, SL, ML):
 def generate_data(ICPC, ML, SL, SC, dir):
     os.makedirs(dir, exist_ok=True)
     sequences = generate_sequence(SC, SL)
-    pwm = generate_motif(SC, SL, ML, ICPC)
+    pwm, pwm_before = generate_motif(SC, SL, ML, ICPC)
     binding_sites = generate_binding_sites(pwm, SC, SL, ML)
     planted, planted_sites = plant(sequences, binding_sites, SL, ML)
 
@@ -153,12 +156,12 @@ def generate_data(ICPC, ML, SL, SC, dir):
             line = row.strip().split(" ")
             file.write("Start Index: {} End Index: {}\n".format(line[0], line[1]))
 
-    zipped = zip(*pwm)
+    #zipped = zip(*pwm_after)
 
     with open(dir+"motif.txt", "w+") as file:
         i = 1
         file.write(">MOTIF{}\t{}\n".format(i, ML))
-        for row in zipped:
+        for row in pwm_before:
             for column in row:
                 file.write("{}\t".format(column))
             file.write("\n")

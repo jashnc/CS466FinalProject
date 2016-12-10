@@ -1,5 +1,5 @@
-Start Index: 477 End Index: 481
-Start Index: 368 End Index: 374
-Start Index: 434 End Index: 439
-Start Index: 36 End Index: 41
-Start Index: 316 End Index: 319
+Start Index: 304 End Index: 308
+Start Index: 293 End Index: 296
+Start Index: 302 End Index: 305
+Start Index: 230 End Index: 235
+Start Index: 156 End Index: 159
