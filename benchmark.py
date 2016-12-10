@@ -36,13 +36,12 @@ def generate_motif(SC, SL, ML, ICPC):
     sample_sequence = generate_sequence(SC, ML)
     nucleotides = ['A','C','G','T']
     profile_matrix = []
-    pwm_before = []
     for h in range(ML):
         col = [row[h] for row in sample_sequence]
         row_count = count(col, SC, ICPC, ML)
         profile_matrix.append(row_count)
     pwm = list(zip(*profile_matrix[::-1]))
-    return pwm, pwm_before
+    return pwm
 
 
 def count(sequence, SC, ICPC, ML):
@@ -59,20 +58,22 @@ def count(sequence, SC, ICPC, ML):
 
     counter = [(x / SC) for x in counter]
     if counter[0] != 0.0:
-        counter[0] = -math.log(counter[0], 2)
+        counter[0] = -math.log2(counter[0])
     if counter[1] != 0.0:
-        counter[1] = -math.log(counter[1], 2)
+        counter[1] = -math.log2(counter[1])
     if counter[2] != 0.0:
-        counter[2] = -math.log(counter[2], 2)
+        counter[2] = -math.log2(counter[2])
     if counter[3] != 0.0:
-        counter[3] = -math.log(counter[3], 2)
+        counter[3] = -math.log2(counter[3])
 
-    if sum(counter) == 0:
-        total = ICPC*ML
+    sum_counter = sum(counter)
+    if sum_counter == 0 or sum_counter == 0.0:
+        for i in range(len(counter)):
+            if counter[i] == -0.0:
+                counter[i] = ICPC
     else:
-        total = ICPC*ML/sum(counter)
-
-    counter = [x * total for x in counter]
+        total = ICPC/sum_counter
+        counter = [x * total for x in counter]
 
     return counter
 
@@ -127,8 +128,7 @@ def plant(sequences, binding_sites, SL, ML):
 def generate_data(ICPC, ML, SL, SC, dir):
     os.makedirs(dir, exist_ok=True)
     sequences = generate_sequence(SC, SL)
-    pwm, pwm_before = generate_motif(SC, SL, ML, ICPC)
-    print(pwm_before)
+    pwm = generate_motif(SC, SL, ML, ICPC)
     binding_sites = generate_binding_sites(pwm, SC, SL, ML)
     planted, planted_sites = plant(sequences, binding_sites, SL, ML)
 

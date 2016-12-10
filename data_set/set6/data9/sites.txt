@@ -1,5 +1,5 @@
-Start Index: 479 End Index: 484
-Start Index: 365 End Index: 370
-Start Index: 107 End Index: 108
-Start Index: 71 End Index: 75
-Start Index: 254 End Index: 260
+Start Index: 26 End Index: 32
+Start Index: 73 End Index: 76
+Start Index: 137 End Index: 138
+Start Index: 258 End Index: 262
+Start Index: 270 End Index: 273
