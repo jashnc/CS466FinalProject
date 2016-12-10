@@ -1,0 +1,10 @@
+Start Index: 138 End Index: 143
+Start Index: 119 End Index: 120
+Start Index: 92 End Index: 96
+Start Index: 318 End Index: 320
+Start Index: 329 End Index: 331
+Start Index: 187 End Index: 191
+Start Index: 479 End Index: 483
+Start Index: 256 End Index: 260
+Start Index: 324 End Index: 328
+Start Index: 61 End Index: 64

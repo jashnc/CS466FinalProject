@@ -12,12 +12,8 @@
 	# (c) A file containing the motif in a specified format called "motif.txt"
 	# (d) A file containing the motif length called "motiflength.txt"
 
-import random, math, copy
+import random, math, copy, os
 
-ICPC = 2
-ML = 8
-SL = 500
-SC = 10
 
 #Generate random nucleotide sequences according to input parameters
 def generate_sequence(SC, SL):
@@ -33,29 +29,23 @@ def generate_sequence(SC, SL):
     return sequences
 
 
-
 #Generate random motif of length ML
-def generate_motif(SC, SL, ML):
+def generate_motif(SC, SL, ML, ICPC):
     q_beta = .25
 
     sample_sequence = generate_sequence(SC, ML)
     nucleotides = ['A','C','G','T']
     profile_matrix = []
-
-
-
+    pwm_before = []
     for h in range(ML):
         col = [row[h] for row in sample_sequence]
-        row_count = count(col, SC, ICPC)
+        row_count = count(col, SC, ICPC, ML)
         profile_matrix.append(row_count)
-
     pwm = list(zip(*profile_matrix[::-1]))
+    return pwm, pwm_before
 
 
-
-    return pwm
-
-def count(sequence, SC, ICPC):
+def count(sequence, SC, ICPC, ML):
     counter = [0,0,0,0]
     for i in range(len(sequence)):
         if sequence[i] == 'A':
@@ -77,52 +67,51 @@ def count(sequence, SC, ICPC):
     if counter[3] != 0.0:
         counter[3] = -math.log(counter[3], 2)
 
-    total = ICPC/sum(counter)
+    if sum(counter) == 0:
+        total = ICPC*ML
+    else:
+        total = ICPC*ML/sum(counter)
 
     counter = [x * total for x in counter]
 
     return counter
 
-def generate_binding_sites(pwm, SC):
-    binding_sites = []
 
+def generate_binding_sites(pwm, SC, SL, ML):
+    binding_sites = []
     for i in range(SC):
         binding_sites.append(generate_binding_site(pwm, SC, SL, ML))
 
     return binding_sites
 
+
 def generate_binding_site(pwm, SC, SL, ML):
     bases = ['A', 'C', 'G', 'T']
     binding_site = ''
 
-    print(pwm)
     for i in range(ML):
         random_y = random.randint(0, 3)
         random_x = random.randint(0, ML-1)
 
-        num = math.floor((pwm[random_y][random_x] * random.randint(0, 4))) % 4
-        if(random.random() < .5):
+        num = math.floor((pwm[random_y][random_x] * random.randint(0, ML))) % 4
+        if random.random() < .5:
             binding_site += bases[num]
-
-
-
     return binding_site
 
-def plant(sequences, binding_sites, SL):
+
+def plant(sequences, binding_sites, SL, ML):
 
     curr = 0
-
+    planted_sites = []
     temp = []
     for row in sequences:
         rand_starting_index = random.randint(0, SL-ML)
         collapsed_row = ''.join(row)
-        print(rand_starting_index)
-        print(binding_sites[curr])
         temp2 = copy.deepcopy(collapsed_row)
 
         #collapsed_row.replace(collapsed_row[rand_starting_index:(rand_starting_index+ML)], binding_sites[curr])
         collapsed_row = collapsed_row[:rand_starting_index] + binding_sites[curr] + collapsed_row[rand_starting_index+len(binding_sites[curr]):]
-        print(temp2 == collapsed_row)
+        planted_sites.append("{} {}".format(rand_starting_index, rand_starting_index + len(binding_sites[curr])))
         curr += 1
         temp.append(collapsed_row)
 
@@ -132,19 +121,70 @@ def plant(sequences, binding_sites, SL):
     for row in temp:
 
         new_sequences.append(list(row))
+    return new_sequences, planted_sites
 
 
-    print(len(new_sequences))
-    return new_sequences
+def generate_data(ICPC, ML, SL, SC, dir):
+    os.makedirs(dir, exist_ok=True)
+    sequences = generate_sequence(SC, SL)
+    pwm, pwm_before = generate_motif(SC, SL, ML, ICPC)
+    print(pwm_before)
+    binding_sites = generate_binding_sites(pwm, SC, SL, ML)
+    planted, planted_sites = plant(sequences, binding_sites, SL, ML)
+
+    # for j in range(len(sequences)):
+    #     for i in range(len(sequences[0])):
+    #         if sequences[j][i] != planted[j][i]:
+    #             print("{} {} index and {} sequences and {} planted".format(j, i, sequences[j][i], planted[j][i]))
+
+    with open(dir+"sequences.fa", "w+") as file:
+        i = 1
+        for row in planted:
+            temp = ""
+            for column in row:
+                temp += column
+            file.write(">Sequence {}\n".format(i))
+            file.write(temp + "\n")
+            i += 1
+
+    with open(dir+"sites.txt", "w+") as file:
+        i = 1
+        for row in planted_sites:
+            line = row.strip().split(" ")
+            file.write("Start Index: {} End Index: {}\n".format(line[0], line[1]))
+
+    zipped = zip(*pwm)
+
+    with open(dir+"motif.txt", "w+") as file:
+        i = 1
+        file.write(">MOTIF{}\t{}\n".format(i, ML))
+        for row in zipped:
+            for column in row:
+                file.write("{}\t".format(column))
+            file.write("\n")
+        file.write("<")
+
+    with open(dir+"motiflength.txt", "w+") as file:
+        file.write(str(ML))
 
 
+def generate_sets(ICPC, ML, SL, SC, dir):
+    os.makedirs(dir, exist_ok=True)
+    for i in range(1, 11):
+        generate_data(ICPC, ML, SL, SC, "{}/data{}/".format(dir, i))
 
-sequences = generate_sequence(SC, SL)
-print(sequences)
-pwm = generate_motif(SC, SL, ML)
-binding_sites = generate_binding_sites(pwm, SC)
-planted = plant(sequences, binding_sites, SL)
+# default values
+# ICPC = 2
+# ML = 8
+# SL = 500
+# SC = 10
+# generate_data(2, 8, 500, 10, "generated_data/")
+# generate_sets(2, 8, 500, 10, "generated_data/set1")
 
-print(sequences)
-print(planted)
-print(sequences == planted)
+generate_sets(2, 8, 500, 10, "data_set/set1/")
+generate_sets(1, 8, 500, 10, "data_set/set2/")
+generate_sets(1.5, 8, 500, 10, "data_set/set3/")
+generate_sets(2, 6, 500, 10, "data_set/set4/")
+generate_sets(2, 7, 500, 10, "data_set/set5/")
+generate_sets(2, 8, 500, 5, "data_set/set6/")
+generate_sets(2, 8, 500, 20, "data_set/set7/")

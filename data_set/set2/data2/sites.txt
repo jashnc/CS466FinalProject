@@ -1,0 +1,10 @@
+Start Index: 437 End Index: 443
+Start Index: 298 End Index: 301
+Start Index: 237 End Index: 240
+Start Index: 375 End Index: 379
+Start Index: 320 End Index: 325
+Start Index: 27 End Index: 32
+Start Index: 475 End Index: 477
+Start Index: 170 End Index: 173
+Start Index: 260 End Index: 263
+Start Index: 232 End Index: 237

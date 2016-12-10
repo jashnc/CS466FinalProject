@@ -1,0 +1,10 @@
+Start Index: 345 End Index: 348
+Start Index: 285 End Index: 287
+Start Index: 42 End Index: 46
+Start Index: 5 End Index: 9
+Start Index: 65 End Index: 68
+Start Index: 285 End Index: 286
+Start Index: 400 End Index: 405
+Start Index: 416 End Index: 417
+Start Index: 453 End Index: 455
+Start Index: 440 End Index: 442
