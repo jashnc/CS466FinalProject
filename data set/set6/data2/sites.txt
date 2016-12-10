@@ -1,5 +1,0 @@
-Start Index: 454 End Index: 457
-Start Index: 286 End Index: 288
-Start Index: 71 End Index: 74
-Start Index: 319 End Index: 323
-Start Index: 98 End Index: 102

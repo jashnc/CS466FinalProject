@@ -1,5 +1,0 @@
-Start Index: 240 End Index: 244
-Start Index: 256 End Index: 263
-Start Index: 338 End Index: 342
-Start Index: 268 End Index: 271
-Start Index: 27 End Index: 30

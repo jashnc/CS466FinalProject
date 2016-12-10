@@ -1,5 +1,0 @@
-Start Index: 185 End Index: 190
-Start Index: 412 End Index: 418
-Start Index: 405 End Index: 410
-Start Index: 180 End Index: 181
-Start Index: 14 End Index: 18
