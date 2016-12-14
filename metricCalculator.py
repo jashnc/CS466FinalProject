@@ -10,7 +10,10 @@ def calc_overlap(predicted_sites_fname, sites_fname):
 	overlap_cnt = 0
 
 	for i in range(len(sites_lines)):
+		sites_lines[i] = sites_lines[i].strip()
 		site_line_split = sites_lines[i].split()
+
+		predicted_sites_lines[i] = predicted_sites_lines[i].strip()
 		predicted_site_line_split = predicted_sites_lines[i].split()
 
 		site_start = int(site_line_split[2])
@@ -19,12 +22,12 @@ def calc_overlap(predicted_sites_fname, sites_fname):
 		predicted_start = int(predicted_site_line_split[2])
 		predicted_end = int(predicted_site_line_split[5])
 
-		if max(predicted_start, site_start) < min(site_end, predicted_end):
+		if max(predicted_start, site_start) <= min(site_end, predicted_end):
 			overlap_cnt += 1
 
 	return overlap_cnt
 
-def get_background_probabilities(motif_matrix)
+def get_background_probabilities(motif_matrix):
 	q = {}
 	a_cnt = 0
 	c_cnt = 0
@@ -42,10 +45,10 @@ def get_background_probabilities(motif_matrix)
 				t_cnt += motif_matrix[j][i]
 
 	total_cnt = a_cnt + c_cnt + g_cnt + t_cnt
-	q["A"] = float(a_cnt)/total 
-	q["C"] = float(c_cnt)/total 
-	q["T"] = float(t_cnt)/total 
-	q["G"] = float(g_cnt)/total 
+	q["A"] = float(a_cnt)/total_cnt 
+	q["C"] = float(c_cnt)/total_cnt 
+	q["T"] = float(t_cnt)/total_cnt  
+	q["G"] = float(g_cnt)/total_cnt 
 
 	return q
 
@@ -67,8 +70,8 @@ def calc_entropy(motif_fname, predicted_motif_fname):
 	motif_matrix = motif_matrix[1:len(motif_matrix)-1]
 	for i in range(len(motif_matrix)):
 		motif_matrix[i] = motif_matrix[i].strip()
-		motif_matrix[i] = motif_matrix[i].split("\t")
-		motif_matrix[i] = [int(x) for x in m[i]]
+		motif_matrix[i] = motif_matrix[i].split()
+		motif_matrix[i] = [int(x) for x in motif_matrix[i]]
 
 	q = get_background_probabilities(motif_matrix)
 
@@ -76,8 +79,8 @@ def calc_entropy(motif_fname, predicted_motif_fname):
 	predicted_matrix = predicted_matrix[1:len(predicted_matrix)-1]
 	for i in range(len(predicted_matrix)):
 		predicted_matrix[i] = predicted_matrix[i].strip()
-		predicted_matrix[i] = predicted_matrix[i].split("\t")
-		predicted_matrix[i] = [int(x) for x in m[i]]
+		predicted_matrix[i] = predicted_matrix[i].split()
+		predicted_matrix[i] = [int(x) for x in predicted_matrix[i]]
 
 	W = create_pwm(predicted_matrix)
 
@@ -94,26 +97,23 @@ def calc_entropy(motif_fname, predicted_motif_fname):
 			elif j == 3:
 				base_prob = q["T"]
 
-			entropy += (W[i][j]*math.log(W[i][j]/base_prob, 2))
+			if W[i][j] != 0:
+				entropy += (W[i][j]*math.log(W[i][j]/base_prob, 2))
 
 	return entropy
 
 overlap_cnt = 0
 for i in range(1, 8):
 	for j in range(1, 11):
-		for folder, subs, files in os.walk("data_set\set"+str(i)+"\data"+str(j)):
-			predicted_sites_fname = "data_set\set"+str(i)+"\data"+str(j)+"\predictedsites.txt"
-			sites_fname = "data_set\set"+str(i)+"\data"+str(j)+"\sites.txt"
+			predicted_sites_fname = "data_set/set"+str(i)+"/data"+str(j)+"/predictedsites.txt"
+			sites_fname = "data_set/set"+str(i)+"/data"+str(j)+"/sites.txt"
 			overlap_cnt += calc_overlap(predicted_sites_fname, sites_fname)
-			print "Number of overlapping sites for dataset"+str(i)+ ", data"+str(j)+": " + str(overlap_cnt)
+			print("Number of overlapping sites for dataset %d, data %d: %d" % (i, j, overlap_cnt))
 
-			motif_fname = "data_set\set"+str(i)+"\data"+str(j)+"\motif.txt"
-			predicted_motif_fname = "data_set\set"+str(i)+"\data"+str(j)+"\predictedmotif.txt"
+			motif_fname = "data_set/set"+str(i)+"/data"+str(j)+"/motif.txt"
+			predicted_motif_fname = "data_set/set"+str(i)+"/data"+str(j)+"/predictedmotif.txt"
 			relative_entropy = calc_entropy(motif_fname, predicted_motif_fname)
-			print "Entropy for dataset"+str(i)+ ", data"+str(j)+": " + str(relative_entropy)
-
-			#Run time here
-			
+			print("Relative entropy for dataset %d, data %d: %d" % (i, j, overlap_cnt))
 
 
 
