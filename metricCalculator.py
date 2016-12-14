@@ -113,7 +113,7 @@ for i in range(1, 8):
 			motif_fname = "data_set/set"+str(i)+"/data"+str(j)+"/motif.txt"
 			predicted_motif_fname = "data_set/set"+str(i)+"/data"+str(j)+"/predictedmotif.txt"
 			relative_entropy = calc_entropy(motif_fname, predicted_motif_fname)
-			print("Relative entropy for dataset %d, data %d: %d" % (i, j, overlap_cnt))
+			print("Relative entropy for dataset %d, data %d: %d" % (i, j, relative_entropy))
 
 
 
